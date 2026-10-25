@@ -12,7 +12,7 @@ If the Xcode Command Line Tools aren't installed yet, the script starts that ins
 
 ## What it does
 
-1. Installs Homebrew if it's missing, then runs `brew bundle --no-upgrade` on the `Brewfile`. It only installs what's missing; use `brew upgrade` to update.
+1. Installs Homebrew if it's missing, then installs each `brew`/`cask` entry in the `Brewfile` one at a time, with a `[n/N]` counter and Homebrew's download progress. It skips anything already installed and never upgrades; use `brew upgrade` for that. If a package fails, it keeps going, then lists the failures at the end.
 2. Runs `stow` on every package into `$HOME`. Real files it would replace are moved to `~/.dotfiles-backup/<timestamp>/` first.
 3. Installs the tmux plugin manager and its plugins, plus the Neovim (LazyVim) plugins.
 

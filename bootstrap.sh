@@ -28,8 +28,28 @@ brew trust --formula felixkratz/formulae/borders jandedobbeleer/oh-my-posh/oh-my
 brew trust --cask nikitabobko/tap/aerospace
 
 log "Installing apps from Brewfile"
-# Install missing packages only; upgrading existing ones (and their sudo prompts) is left to `brew upgrade`
-brew bundle --no-upgrade --file="$DOTFILES/Brewfile"
+# One package at a time so each shows a [n/N] counter and Homebrew's download progress.
+# Installs missing packages only; upgrading existing ones (and their sudo prompts) is left to `brew upgrade`.
+KINDS=() NAMES=() FAILED=()
+while read -r kind name; do
+  KINDS+=("$kind"); NAMES+=("$name")
+done < <(sed -nE 's/^[[:space:]]*(brew|cask)[[:space:]]+"([^"]+)".*/\1 \2/p' "$DOTFILES/Brewfile")
+
+total=${#NAMES[@]}
+for i in "${!NAMES[@]}"; do
+  name="${NAMES[$i]}"
+  flag=--formula; [ "${KINDS[$i]}" = cask ] && flag=--cask
+  n=$((i + 1))
+  if brew list "$flag" "$name" >/dev/null 2>&1; then
+    printf '\033[32m✓\033[0m [%d/%d] %s (already installed)\n' "$n" "$total" "$name"
+  else
+    printf '\n\033[1m→ [%d/%d] Installing %s\033[0m\n' "$n" "$total" "$name"
+    if ! brew install "$flag" "$name"; then
+      printf '\033[31m✗ [%d/%d] %s failed, continuing\033[0m\n' "$n" "$total" "$name"
+      FAILED+=("$name")
+    fi
+  fi
+done
 
 log "Linking dotfiles with stow"
 for pkg in "${PACKAGES[@]}"; do
@@ -67,3 +87,8 @@ Next steps:
   - Launch AeroSpace once and grant Accessibility permission
 EOF
 if [ -d "$BACKUP" ]; then echo "Replaced files were saved to $BACKUP"; fi
+if [ ${#FAILED[@]} -gt 0 ]; then
+  printf '\n\033[31mThese packages failed to install: %s\033[0m\n' "${FAILED[*]}"
+  echo "Fix the error shown above for each, then re-run this script."
+  exit 1
+fi
