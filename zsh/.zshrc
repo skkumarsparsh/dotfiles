@@ -2,6 +2,9 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 export PATH="$HOME/.local/bin:$(go env GOPATH)/bin:/opt/homebrew/opt/curl/bin:$PATH"
 
+# opencode (installed by its own script into ~/.opencode)
+[ -d "$HOME/.opencode/bin" ] && export PATH="$HOME/.opencode/bin:$PATH"
+
 eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
 
 source <(fzf --zsh)
