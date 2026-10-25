@@ -22,6 +22,27 @@ Secrets and machine-specific setup stay out of the repo: SSH keys, kube/tsh/gh c
 
 ## Changing things
 
-- Edit a config here, and on this Mac it takes effect right away, since the files are symlinked.
-- Add an app: add it to `Brewfile`, then run `brew bundle --file ~/dotfiles/Brewfile`.
-- Add a config: create `<tool>/<path relative to $HOME>`, add `<tool>` to `PACKAGES` in `bootstrap.sh`, then re-run the script.
+The commands below assume the repo lives at `~/dotfiles`. Use your clone's actual path if it's elsewhere (for example `~/Developer/dotfiles`).
+
+Configs in `$HOME` are symlinks into this repo, so editing `~/.zshrc`, `~/.config/tmux/tmux.conf`, etc. edits the repo file directly. Changes take effect right away on the Mac you edited them on.
+
+- **Add an app:** add a `brew`/`cask` line to `Brewfile`. If it comes from a third-party tap, also add the tap to `Brewfile` and to the `brew trust` lines in `bootstrap.sh`.
+- **Add a config:** move the file into `<tool>/<path relative to $HOME>`, add `<tool>` to `PACKAGES` in `bootstrap.sh`, then re-run `./bootstrap.sh` to link it.
+
+## Pushing a change
+
+```sh
+cd ~/dotfiles
+git status                      # review what changed; make sure no secrets slipped in
+git add -A
+git commit -m "chore: update tmux config"
+git push
+```
+
+## Pulling changes on another Mac
+
+```sh
+git -C ~/dotfiles pull && ~/dotfiles/bootstrap.sh
+```
+
+`git pull` alone is enough when you only edited existing config files, because the symlinks already point at them. Re-run `bootstrap.sh` when you added an app or a new config file; it installs anything missing and links new files. It's safe to re-run, and it never upgrades apps you already have.
