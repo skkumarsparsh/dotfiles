@@ -35,6 +35,23 @@ while read -r kind name; do
   KINDS+=("$kind"); NAMES+=("$name")
 done < <(sed -nE 's/^[[:space:]]*(brew|cask)[[:space:]]+"([^"]+)".*/\1 \2/p' "$DOTFILES/Brewfile")
 
+# Prints the /Applications path of an app a cask installs, if that app is already there.
+# Homebrew tries to "adopt" such apps, which macOS App Management blocks unless the terminal has that permission.
+existing_cask_app() {
+  brew info --cask --json=v2 "$1" 2>/dev/null | /usr/bin/python3 -I -c '
+import json, os, sys
+for cask in json.load(sys.stdin)["casks"]:
+    for artifact in cask["artifacts"]:
+        for app in artifact.get("app", []):
+            if isinstance(app, dict):
+                app = app.get("target", "")
+            path = os.path.join("/Applications", os.path.basename(app))
+            if app and os.path.exists(path):
+                print(path)
+                sys.exit()
+'
+}
+
 total=${#NAMES[@]}
 for i in "${!NAMES[@]}"; do
   name="${NAMES[$i]}"
@@ -42,6 +59,8 @@ for i in "${!NAMES[@]}"; do
   n=$((i + 1))
   if brew list "$flag" "$name" >/dev/null 2>&1; then
     printf '\033[32m✓\033[0m [%d/%d] %s (already installed)\n' "$n" "$total" "$name"
+  elif [ "$flag" = --cask ] && app="$(existing_cask_app "$name")" && [ -n "$app" ]; then
+    printf '\033[33m✓\033[0m [%d/%d] %s (%s exists, installed outside Homebrew; skipping)\n' "$n" "$total" "$name" "$app"
   else
     printf '\n\033[1m→ [%d/%d] Installing %s\033[0m\n' "$n" "$total" "$name"
     if ! brew install "$flag" "$name"; then

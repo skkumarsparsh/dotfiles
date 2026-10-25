@@ -13,6 +13,8 @@ If the Xcode Command Line Tools aren't installed yet, the script starts that ins
 ## What it does
 
 1. Installs Homebrew if it's missing, then installs each `brew`/`cask` entry in the `Brewfile` one at a time, with a `[n/N]` counter and Homebrew's download progress. It skips anything already installed and never upgrades; use `brew upgrade` for that. If a package fails, it keeps going, then lists the failures at the end.
+
+   If an app is already in `/Applications` but wasn't installed by Homebrew (for example, downloaded from the web), the script leaves it alone. Homebrew would otherwise try to take it over, and macOS blocks that with `chmod: ... Operation not permitted`. To have Homebrew manage such an app, so `brew upgrade` updates it, give your terminal **App Management** access (System Settings → Privacy & Security → App Management), then run `brew install --cask --adopt <name>`.
 2. Runs `stow` on every package into `$HOME`. Real files it would replace are moved to `~/.dotfiles-backup/<timestamp>/` first.
 3. Installs the tmux plugin manager and its plugins, plus the Neovim (LazyVim) plugins.
 
