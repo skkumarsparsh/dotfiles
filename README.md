@@ -5,7 +5,7 @@ Sets up a Mac with my Homebrew apps (`Brewfile`) and configs (GNU Stow packages,
 ## New Mac, one command
 
 ```sh
-git clone https://github.com/skumar11-ib/dotfiles.git ~/dotfiles && ~/dotfiles/bootstrap.sh
+git clone https://github.com/skkumarsparsh/dotfiles.git ~/dotfiles && ~/dotfiles/bootstrap.sh
 ```
 
 If the Xcode Command Line Tools aren't installed yet, the script starts that install and exits; run it again once the install finishes.
