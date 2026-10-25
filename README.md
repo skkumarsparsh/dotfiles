@@ -8,11 +8,11 @@ Sets up a Mac with my Homebrew apps (`Brewfile`) and configs (GNU Stow packages,
 git clone https://github.com/skumar11-ib/dotfiles.git ~/dotfiles && ~/dotfiles/bootstrap.sh
 ```
 
-The repo is private, so `git clone` asks for your GitHub username and a personal access token as the password (or use the SSH URL if the Mac already has a key). If the Xcode Command Line Tools aren't installed yet, the script starts that install and exits; run it again once the install finishes.
+If the Xcode Command Line Tools aren't installed yet, the script starts that install and exits; run it again once the install finishes.
 
 ## What it does
 
-1. Installs Homebrew if it's missing, then runs `brew bundle` on the `Brewfile`.
+1. Installs Homebrew if it's missing, then runs `brew bundle --no-upgrade` on the `Brewfile`. It only installs what's missing; use `brew upgrade` to update.
 2. Runs `stow` on every package into `$HOME`. Real files it would replace are moved to `~/.dotfiles-backup/<timestamp>/` first.
 3. Installs the tmux plugin manager and its plugins, plus the Neovim (LazyVim) plugins.
 

@@ -28,7 +28,8 @@ brew trust --formula felixkratz/formulae/borders jandedobbeleer/oh-my-posh/oh-my
 brew trust --cask nikitabobko/tap/aerospace
 
 log "Installing apps from Brewfile"
-brew bundle --file="$DOTFILES/Brewfile"
+# Install missing packages only; upgrading existing ones (and their sudo prompts) is left to `brew upgrade`
+brew bundle --no-upgrade --file="$DOTFILES/Brewfile"
 
 log "Linking dotfiles with stow"
 for pkg in "${PACKAGES[@]}"; do
